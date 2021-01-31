@@ -11,9 +11,9 @@ export default class Category extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @Field()
-  @Column()
-  coverImage: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  coverImage?: string;
 
   @Field(() => [Anime])
   @ManyToMany(() => Anime, (anime) => anime.categories)

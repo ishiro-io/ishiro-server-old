@@ -82,8 +82,7 @@
       "parser": "typescript",
       "options": {
         "alias": [
-          "@api",
-          "@database"
+          "@ishiro"
         ]
       }
     }

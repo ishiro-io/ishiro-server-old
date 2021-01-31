@@ -32,17 +32,17 @@ export default class Anime extends BaseEntity {
   @Column({ nullable: true })
   titleJapanese?: string;
 
-  @Field()
-  @Column()
-  bannerImage: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  bannerImage?: string;
 
-  @Field()
-  @Column()
-  posterImage: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  posterImage?: string;
 
-  @Field()
-  @Column({ type: "text" })
-  description: string;
+  @Field({ nullable: true })
+  @Column({ type: "text", nullable: true })
+  description?: string;
 
   @Field({ nullable: true })
   @Column({ type: "float", nullable: true })
@@ -88,9 +88,4 @@ export default class Anime extends BaseEntity {
   @Field(() => [Episode])
   @OneToMany(() => Episode, (episode) => episode.anime)
   episodes: Episode[];
-
-  @Field()
-  episodeCount(): number {
-    return this.episodes.length;
-  }
 }

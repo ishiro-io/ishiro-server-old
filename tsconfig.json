@@ -5,17 +5,24 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "noImplicitReturns": true,
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@api/*": [
+      "@ishiro/api/*": [
         "apps/api/src/*"
       ],
-      "@database/*": [
+      "@ishiro/scheduler/*": [
+        "apps/scheduler/src/*"
+      ],
+      "@ishiro/libs/database/*": [
         "libs/database/src/*"
+      ],
+      "@ishiro/libs/shared/*": [
+        "libs/shared/src/*"
       ]
     }
   }

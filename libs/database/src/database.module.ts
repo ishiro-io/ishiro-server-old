@@ -1,16 +1,16 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { Anime, Category, Episode } from './entities';
+import { Anime, Category, Episode } from "./entities";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: "postgres",
       url: process.env.DATABASE_URL,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== "production",
       logging: false,
       cache: true,
       entities: [Anime, Category, Episode],

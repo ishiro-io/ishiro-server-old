@@ -22,10 +22,6 @@ export default class Episode extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  thumbnail?: string;
-
-  @Field({ nullable: true })
-  @Column({ nullable: true })
   airedDate?: string;
 
   @Field(() => Anime)
