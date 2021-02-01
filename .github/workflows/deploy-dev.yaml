@@ -36,7 +36,7 @@ jobs:
       - name: Run test runner
         run: yarn test --passWithNoTests
 
-  deploy-dev: 
+  deploy-dev-api: 
     runs-on: ubuntu-latest
 
     needs: test-dev
@@ -46,12 +46,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - id: deploy
-        name: Deploy to dokku
+      - id: deploy-api
+        name: Deploy API to dokku
         uses: idoberko2/dokku-deploy-github-action@v1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           dokku-host: ${{ secrets.DOKKU_HOST }}
-          app-name: ${{ secrets.DOKKU_DEV_APP_NAME }}
+          app-name: ${{ secrets.DOKKU_DEV_API_APP_NAME }}
+          git-push-flags: --force
+
+  deploy-dev-scheduler: 
+    runs-on: ubuntu-latest
+
+    needs: test-dev
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - id: deploy-scheduler
+        name: Deploy scheduler to dokku
+        uses: idoberko2/dokku-deploy-github-action@v1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          dokku-host: ${{ secrets.DOKKU_HOST }}
+          app-name: ${{ secrets.DOKKU_DEV_SCHEDULER_APP_NAME }}
           git-push-flags: --force
      
