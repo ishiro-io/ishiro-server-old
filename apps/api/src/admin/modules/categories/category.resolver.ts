@@ -1,11 +1,13 @@
 import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { mapSeries } from "async";
 
+import categoriesList from "@ishiro/api/admin/data/categories-list";
 import { Category } from "@ishiro/libs/database/entities";
 import {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "@ishiro/libs/shared/inputs";
-import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fixNullPrototype.pipe";
+import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
 import { CategoryService } from "@ishiro/libs/shared/services";
 
 @Resolver(() => Category)
@@ -37,5 +39,17 @@ export class CategoryResolver {
     @Args("input", FixNullPrototypePipe) input: UpdateCategoryInput
   ): Promise<Category> {
     return this.categoryService.updateCategory(id, input);
+  }
+
+  @Mutation(() => [Category], { nullable: true })
+  async populateCategories(): Promise<Category[] | null> {
+    const categories = await mapSeries<any, Category>(
+      categoriesList,
+      async ({ name }) => {
+        return this.categoryService.createCategory({ name });
+      }
+    );
+
+    return categories;
   }
 }

@@ -5,7 +5,7 @@ import {
   CreateEpisodeInput,
   UpdateEpisodeInput,
 } from "@ishiro/libs/shared/inputs";
-import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fixNullPrototype.pipe";
+import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
 import { EpisodeService } from "@ishiro/libs/shared/services";
 
 @Resolver(() => Episode)

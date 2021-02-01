@@ -1,3 +1,4 @@
+import { Inject, forwardRef } from "@nestjs/common";
 import {
   Args,
   Int,
@@ -7,15 +8,28 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { mapSeries } from "async";
+import { format } from "date-fns";
 
 import { Anime } from "@ishiro/libs/database/entities";
 import { CreateAnimeInput, UpdateAnimeInput } from "@ishiro/libs/shared/inputs";
-import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fixNullPrototype.pipe";
-import { AnimeService } from "@ishiro/libs/shared/services";
+import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
+import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
+import { ExternalAPIService } from "@ishiro/libs/shared/services/external-api.service";
+import { delay } from "@ishiro/libs/utils";
+
+import idsMALList from "../../data/mal-ids-list";
+import { PopulateAnimesInput, PopulatedAnimesOutput } from "./anime.input";
 
 @Resolver(() => Anime)
 export class AnimeResolver {
-  constructor(private readonly animeService: AnimeService) {}
+  constructor(
+    private readonly animeService: AnimeService,
+    @Inject(forwardRef(() => ExternalAPIService))
+    private readonly externalAPIService: ExternalAPIService,
+    @Inject(forwardRef(() => EpisodeService))
+    private readonly episodeService: EpisodeService
+  ) {}
 
   @Query(() => [Anime], { name: "animes", nullable: false })
   async getAnimes(): Promise<Anime[]> {
@@ -40,6 +54,63 @@ export class AnimeResolver {
     @Args("input", FixNullPrototypePipe) input: UpdateAnimeInput
   ): Promise<Anime> {
     return this.animeService.updateAnime(id, input);
+  }
+
+  @Mutation(() => PopulatedAnimesOutput, { nullable: true })
+  async populateAnimes(
+    @Args("input")
+    {
+      animeAmount,
+      offset,
+      doPopulateEpisodes,
+      doTranslateDescription,
+    }: PopulateAnimesInput
+  ): Promise<PopulatedAnimesOutput | null> {
+    const startTime = Date.now();
+
+    const idsMAL = idsMALList.slice(offset, animeAmount + offset);
+
+    const inputs = await mapSeries<any, CreateAnimeInput>(
+      idsMAL,
+      async (id) => {
+        await delay(5000);
+        return this.externalAPIService.buildNewAnimeInput(
+          id,
+          doTranslateDescription
+        );
+      }
+    );
+
+    const animes = await mapSeries<any, Anime>(inputs, async (input) => {
+      const anime = await this.animeService.createAnime(input);
+      return anime;
+    });
+
+    if (doPopulateEpisodes) {
+      await mapSeries(animes, async (a) => {
+        const episodeInputs = await this.externalAPIService.buildAnimeEpisodesInput(
+          a.idMAL,
+          a.id
+        );
+
+        await mapSeries(episodeInputs, async (input) => {
+          const episode = await this.episodeService.createEpisode(input);
+
+          return episode;
+        });
+      });
+    }
+
+    const fields = await mapSeries<Anime, Anime>(animes, async (a) => {
+      return this.animeService.findById(a.id);
+    });
+
+    const endTime = Date.now();
+
+    return {
+      timeToPopulate: format(endTime - startTime, "mm:ss"),
+      fields,
+    };
   }
 
   @ResolveField(() => Int)
