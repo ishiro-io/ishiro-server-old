@@ -1,30 +1,26 @@
 import { Module } from "@nestjs/common";
-import { APP_GUARD } from "@nestjs/core";
+import { ConfigModule } from "@nestjs/config";
 import { GraphQLModule } from "@nestjs/graphql";
 
-import { AuthGuard } from "./guard/auth.guard";
+import { DatabaseModule } from "@ishiro/libs/database/database.module";
+
 import { AnimeModule } from "./modules/animes/anime.module";
 import { CategoryModule } from "./modules/categories/category.module";
 import { EpisodeModule } from "./modules/episodes/episode.module";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
     AnimeModule,
     CategoryModule,
     EpisodeModule,
     GraphQLModule.forRoot({
-      include: [AnimeModule, CategoryModule, EpisodeModule],
-      autoSchemaFile: "admin-schema.gql",
-      path: "admin",
+      autoSchemaFile: true,
+      path: "/",
       introspection: true,
       playground: true,
     }),
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
 })
-export class AdminModule {}
+export class AppModule {}

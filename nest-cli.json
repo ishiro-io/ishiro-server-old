@@ -2,6 +2,16 @@
   "collection": "@nestjs/schematics",
   "monorepo": true,
   "projects": {
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json",
+        "webpack": true
+      }
+    },
     "api": {
       "type": "application",
       "root": "apps/api",

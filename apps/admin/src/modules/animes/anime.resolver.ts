@@ -18,7 +18,7 @@ import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
 import { ExternalAPIService } from "@ishiro/libs/shared/services/external-api.service";
 import { delay } from "@ishiro/libs/utils";
 
-import idsMALList from "../../data/mal-ids-list";
+import idsMALList from "../../../../../libs/shared/src/data/mal-ids-list";
 import { PopulateAnimesInput, PopulatedAnimesOutput } from "./anime.input";
 
 @Resolver(() => Anime)

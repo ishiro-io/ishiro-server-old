@@ -1,8 +1,8 @@
 import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { mapSeries } from "async";
 
-import categoriesList from "@ishiro/api/admin/data/categories-list";
 import { Category } from "@ishiro/libs/database/entities";
+import categoriesList from "@ishiro/libs/shared/data/categories-list";
 import {
   CreateCategoryInput,
   UpdateCategoryInput,
