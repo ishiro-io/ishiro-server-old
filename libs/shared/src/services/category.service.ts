@@ -23,6 +23,12 @@ export class CategoryService {
     });
   }
 
+  async findIdFromName(name: string): Promise<number> {
+    const category = await Category.findOne({ where: { name } });
+
+    return category.id ?? 0;
+  }
+
   findByIds(ids: number[]): Promise<Category[]> {
     return this.categoryRepository.find({
       where: { id: In(ids) },

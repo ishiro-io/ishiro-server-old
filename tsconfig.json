@@ -23,7 +23,10 @@
       ],
       "@ishiro/libs/shared/*": [
         "libs/shared/src/*"
-      ]
+      ],
+      "@ishiro/libs/utils": [
+        "libs/utils/src"
+      ],
     }
   }
 }

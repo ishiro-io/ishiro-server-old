@@ -36,6 +36,12 @@ export class AnimeService {
   }
 
   async createAnime(data: CreateAnimeInput): Promise<Anime> {
+    const check = await this.animeRepository.findOne({
+      where: { title: data.title },
+    });
+
+    if (check) return check;
+
     const anime = await this.animeRepository.create(data);
 
     if (data.categoriesIds?.length > 0) {

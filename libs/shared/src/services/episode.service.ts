@@ -33,6 +33,13 @@ export class EpisodeService {
   }
 
   async createEpisode(data: CreateEpisodeInput): Promise<Episode> {
+    const check = await this.episodeRepository.findOne({
+      where: { number: data.number, anime: data.animeId },
+      relations: ["anime"],
+    });
+
+    if (check) return check;
+
     const episode = await this.episodeRepository.create(data);
 
     const anime = await this.animeService.findById(data.animeId);
