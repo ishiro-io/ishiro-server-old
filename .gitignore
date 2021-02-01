@@ -2,6 +2,9 @@
 
 .env
 
+# typeorm
+migrations/*
+
 # compiled output
 /dist
 /temp
