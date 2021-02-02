@@ -1,17 +1,10 @@
-import { Field, ObjectType, registerEnumType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 
-import { AnimeStatus, AnimeType } from "../enums";
-import BaseEntity from "./BaseEntity";
+import { AnimeStatus, AnimeType } from "@ishiro/libs/shared/enums";
+
+import BaseEntity from "./base-entity";
 import { Category, Episode } from ".";
-
-registerEnumType(AnimeType, {
-  name: "AnimeType",
-});
-
-registerEnumType(AnimeStatus, {
-  name: "AnimeStatus",
-});
 
 @Entity()
 @ObjectType()

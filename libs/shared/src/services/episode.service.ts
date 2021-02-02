@@ -2,7 +2,7 @@ import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 
-import { Anime, Episode } from "@ishiro/libs/database/entities";
+import { Episode } from "@ishiro/libs/database/entities";
 
 import { CreateEpisodeInput, UpdateEpisodeInput } from "../inputs";
 import { AnimeService } from "./anime.service";
@@ -55,14 +55,5 @@ export class EpisodeService {
     const episode = await this.episodeRepository.findOneOrFail({ id });
 
     return episode.save();
-  }
-
-  async setAnime(ids: number[], anime: Anime) {
-    await this.episodeRepository
-      .createQueryBuilder("episode")
-      .update()
-      .set({ anime })
-      .whereInIds(ids)
-      .execute();
   }
 }
