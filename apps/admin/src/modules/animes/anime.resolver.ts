@@ -11,6 +11,7 @@ import {
 import { mapSeries } from "async";
 import { format } from "date-fns";
 
+import idsMALList from "@ishiro/admin/data/mal-ids-list";
 import { Anime } from "@ishiro/libs/database/entities";
 import { CreateAnimeInput, UpdateAnimeInput } from "@ishiro/libs/shared/inputs";
 import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
@@ -18,7 +19,6 @@ import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
 import { ExternalAPIService } from "@ishiro/libs/shared/services/external-api.service";
 import { delay } from "@ishiro/libs/utils";
 
-import idsMALList from "../../../../../libs/shared/src/data/mal-ids-list";
 import { PopulateAnimesInput, PopulatedAnimesOutput } from "./anime.input";
 
 @Resolver(() => Anime)

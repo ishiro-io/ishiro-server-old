@@ -1,3 +1,5 @@
+import { registerEnumType } from "@nestjs/graphql";
+
 export enum AnimeType {
   TV = "TV",
   TV_SPECIAL = "TV_SPECIAL",
@@ -6,3 +8,7 @@ export enum AnimeType {
   ONA = "ONA",
   MUSIC = "MUSIC",
 }
+
+registerEnumType(AnimeType, {
+  name: "AnimeType",
+});

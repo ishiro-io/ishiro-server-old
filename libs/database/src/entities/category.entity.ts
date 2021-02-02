@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { Column, Entity, ManyToMany } from "typeorm";
 
-import BaseEntity from "./BaseEntity";
+import BaseEntity from "./base-entity";
 import { Anime } from ".";
 
 @Entity()

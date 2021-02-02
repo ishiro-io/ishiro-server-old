@@ -6,7 +6,7 @@ import { fr } from "date-fns/locale";
 import { gql, rawRequest } from "graphql-request";
 import Jikan from "jikants";
 
-import { AnimeStatus, AnimeType } from "@ishiro/libs/database/enums";
+import { AnimeStatus, AnimeType } from "@ishiro/libs/shared/enums";
 
 import unusedCategoryName from "../data/unused-category-name";
 import { CreateAnimeInput, CreateEpisodeInput } from "../inputs";

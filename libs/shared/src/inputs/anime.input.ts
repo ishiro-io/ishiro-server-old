@@ -1,6 +1,6 @@
 import { Field, InputType } from "@nestjs/graphql";
 
-import { AnimeStatus, AnimeType } from "@ishiro/libs/database/enums";
+import { AnimeStatus, AnimeType } from "@ishiro/libs/shared/enums";
 
 @InputType()
 export class CreateAnimeInput {
