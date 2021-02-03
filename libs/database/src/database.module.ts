@@ -2,7 +2,14 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { Anime, Category, Episode, User, UserPhoneAuth } from "./entities";
+import {
+  Anime,
+  Category,
+  Episode,
+  User,
+  UserGoogleAuth,
+  UserPhoneAuth,
+} from "./entities";
 
 @Module({
   imports: [
@@ -13,7 +20,7 @@ import { Anime, Category, Episode, User, UserPhoneAuth } from "./entities";
       synchronize: process.env.NODE_ENV !== "production",
       logging: false,
       cache: true,
-      entities: [Anime, Category, Episode, User, UserPhoneAuth],
+      entities: [Anime, Category, Episode, User, UserGoogleAuth, UserPhoneAuth],
       autoLoadEntities: true,
       keepConnectionAlive: true,
     }),

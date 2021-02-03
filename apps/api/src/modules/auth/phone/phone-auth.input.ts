@@ -5,14 +5,14 @@ import { IS_USERNAME_ALREADY_EXIST_ERROR } from "@ishiro/api/constants/errorMess
 import { IsUsernameAlreadyExist } from "@ishiro/api/validators";
 
 @InputType()
-export class AskConfirmationCodeInput {
+export class PhoneAskConfirmationCodeInput {
   @Field()
   @IsMobilePhone("fr-FR")
   phoneNumber: string;
 }
 
 @InputType()
-export class ConnectInput {
+export class PhoneConnectInput {
   @Field()
   @IsMobilePhone("fr-FR")
   phoneNumber: string;
@@ -22,7 +22,7 @@ export class ConnectInput {
 }
 
 @InputType()
-export class RegisterInput {
+export class PhoneRegisterInput {
   @Field()
   @IsMobilePhone("fr-FR")
   phoneNumber: string;

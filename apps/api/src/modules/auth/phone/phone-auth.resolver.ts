@@ -4,44 +4,39 @@ import { User } from "@ishiro/libs/database/entities";
 import { IshiroContext } from "@ishiro/libs/shared/interfaces/Context";
 
 import {
-  AskConfirmationCodeInput,
-  ConnectInput,
-  RegisterInput,
+  PhoneAskConfirmationCodeInput,
+  PhoneConnectInput,
+  PhoneRegisterInput,
 } from "./phone-auth.input";
-import { ConnectOutput } from "./phone-auth.output";
+import { PhoneConnectOutput } from "./phone-auth.output";
 import { PhoneAuthService } from "./phone-auth.service";
 
 @Resolver(() => User)
 export class PhoneAuthResolver {
   constructor(private readonly phoneAuthService: PhoneAuthService) {}
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Boolean, { name: "phoneAskConfirmationCode" })
   async askConfirmationCode(
     @Args("input")
-    { phoneNumber }: AskConfirmationCodeInput
+    { phoneNumber }: PhoneAskConfirmationCodeInput
   ): Promise<boolean> {
     return this.phoneAuthService.askConfirmationCode(phoneNumber);
   }
 
-  @Mutation(() => ConnectOutput, { nullable: true })
+  @Mutation(() => PhoneConnectOutput, { name: "phoneConnect", nullable: true })
   async connect(
     @Args("input")
-    input: ConnectInput,
+    input: PhoneConnectInput,
     @Context() ctx: IshiroContext
-  ): Promise<ConnectOutput | null> {
+  ): Promise<PhoneConnectOutput | null> {
     return this.phoneAuthService.connect(input, ctx);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { name: "phoneRegister" })
   async register(
-    @Args("input") input: RegisterInput,
+    @Args("input") input: PhoneRegisterInput,
     @Context() ctx: IshiroContext
   ): Promise<User> {
     return this.phoneAuthService.register(input, ctx);
-  }
-
-  @Mutation(() => Boolean)
-  async logout(@Context() ctx: IshiroContext): Promise<boolean> {
-    return this.phoneAuthService.logout(ctx);
   }
 }
