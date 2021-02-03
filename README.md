@@ -1,6 +1,10 @@
 # Ishiro Server
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue.svg?cacheSeconds=2592000)
+![Production CD](https://github.com/ishiro-io/ishiro-server/workflows/Production%20CD/badge.svg)
+![Development CD](https://github.com/ishiro-io/ishiro-server/workflows/Development%20CD/badge.svg)
+![Production CI](https://github.com/ishiro-io/ishiro-server/workflows/Production%20CI/badge.svg)
+![Development CI](https://github.com/ishiro-io/ishiro-server/workflows/Development%20CI/badge.svg)
 
 >🚀 Back-end server for Ishiro made with NestJS
 
