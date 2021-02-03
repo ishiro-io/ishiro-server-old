@@ -10,8 +10,8 @@ import { redisClient } from "@ishiro/api/redis/client";
 import { User, UserPhoneAuth } from "@ishiro/libs/database/entities";
 import { IshiroContext } from "@ishiro/libs/shared/interfaces/Context";
 
-import { ConnectInput, RegisterInput } from "./phone-auth.input";
-import { ConnectOutput } from "./phone-auth.output";
+import { PhoneConnectInput, PhoneRegisterInput } from "./phone-auth.input";
+import { PhoneConnectOutput } from "./phone-auth.output";
 
 @Injectable()
 export class PhoneAuthService {
@@ -22,7 +22,7 @@ export class PhoneAuthService {
     private readonly userRepository: Repository<User>
   ) {}
 
-  private readonly logger = new Logger();
+  private readonly logger = new Logger(PhoneAuthService.name);
 
   private readonly twilioClient = twilio(
     process.env.TWILIO_ACCOUNT_SID,
@@ -58,9 +58,9 @@ export class PhoneAuthService {
   }
 
   async connect(
-    { phoneNumber, code }: ConnectInput,
+    { phoneNumber, code }: PhoneConnectInput,
     ctx: IshiroContext
-  ): Promise<ConnectOutput | null> {
+  ): Promise<PhoneConnectOutput | null> {
     const check = await this.checkConfirmationCode(phoneNumber, code);
 
     if (!check) return null;
@@ -70,13 +70,13 @@ export class PhoneAuthService {
       relations: ["user"],
     });
 
-    ctx.req.session.user = auth.user;
+    ctx.req.session.user = auth?.user;
 
     return { user: auth?.user };
   }
 
   async register(
-    { username, phoneNumber, code }: RegisterInput,
+    { username, phoneNumber, code }: PhoneRegisterInput,
     ctx: IshiroContext
   ): Promise<User | null> {
     const check = await this.checkConfirmationCode(phoneNumber, code);
@@ -90,21 +90,6 @@ export class PhoneAuthService {
     ctx.req.session.user = user;
 
     return user;
-  }
-
-  async logout(ctx: IshiroContext): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      ctx.req.session.destroy((err) => {
-        if (err) {
-          this.logger.error(err);
-          return reject(err);
-        }
-
-        ctx.res.clearCookie("iid");
-
-        return resolve(true);
-      });
-    });
   }
 
   async createConfirmationCode(data: any, prefix: string): Promise<string> {
