@@ -1,4 +1,5 @@
 import { Field, InputType } from "@nestjs/graphql";
+import { MinLength } from "class-validator";
 
 import { AnimeStatus, AnimeType } from "@ishiro/libs/shared/enums";
 
@@ -105,4 +106,11 @@ export class UpdateAnimeInput {
 
   @Field({ nullable: true })
   isAdult?: boolean;
+}
+
+@InputType()
+export class SearchAnimesInput {
+  @Field()
+  @MinLength(3)
+  textSearchField: string;
 }

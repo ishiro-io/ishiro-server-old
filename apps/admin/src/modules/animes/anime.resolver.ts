@@ -65,7 +65,7 @@ export class AnimeResolver {
       doPopulateEpisodes,
       doTranslateDescription,
     }: PopulateAnimesInput
-  ): Promise<PopulatedAnimesOutput | null> {
+  ): Promise<PopulatedAnimesOutput> {
     const startTime = Date.now();
 
     const idsMAL = idsMALList.slice(offset, animeAmount + offset);

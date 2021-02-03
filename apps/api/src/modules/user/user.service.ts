@@ -11,7 +11,7 @@ export class UserService {
     private readonly userRepository: Repository<User>
   ) {}
 
-  async updateUsername(id: number, username: string): Promise<User | null> {
+  async updateUsername(id: number, username: string): Promise<User> {
     const user = await this.userRepository.findOne({ id });
     user.username = username;
 

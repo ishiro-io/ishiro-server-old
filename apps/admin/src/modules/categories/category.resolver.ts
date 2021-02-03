@@ -42,7 +42,7 @@ export class CategoryResolver {
   }
 
   @Mutation(() => [Category], { nullable: true })
-  async populateCategories(): Promise<Category[] | null> {
+  async populateCategories(): Promise<Category[]> {
     const categories = await mapSeries<any, Category>(
       categoriesList,
       async ({ name }) => {

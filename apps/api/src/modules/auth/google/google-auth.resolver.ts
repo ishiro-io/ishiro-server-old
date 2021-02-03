@@ -19,7 +19,7 @@ export class GoogleAuthResolver {
     @Args("input")
     input: GoogleConnectInput,
     @Context() ctx: IshiroContext
-  ): Promise<GoogleConnectOutput | null> {
+  ): Promise<GoogleConnectOutput> {
     return this.googleAuthService.connect(input, ctx);
   }
 

@@ -13,7 +13,7 @@ export class EpisodeResolver {
   constructor(private readonly episodeService: EpisodeService) {}
 
   @Query(() => [Episode], { name: "episodes", nullable: false })
-  async getCategories(): Promise<Episode[]> {
+  async getEpisodes(): Promise<Episode[]> {
     return this.episodeService.findAll();
   }
 
