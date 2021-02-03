@@ -1,12 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { GqlExecutionContext } from "@nestjs/graphql";
 
+import { IshiroContext } from "@ishiro/libs/shared/interfaces/Context";
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const ctx = GqlExecutionContext.create(context);
-    const { req } = ctx.getContext();
+    const ctx = GqlExecutionContext.create(context).getContext<IshiroContext>();
 
-    return req.headers.authorization === process.env.AUTH_KEY;
+    return !!ctx.req.session.user;
   }
 }

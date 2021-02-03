@@ -5,12 +5,14 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { DatabaseModule } from "@ishiro/libs/database/database.module";
 
 import AuthModule from "./modules/auth/auth.module";
+import UserModule from "./modules/user/user.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     AuthModule,
+    UserModule,
     GraphQLModule.forRoot({
       autoSchemaFile: true,
       path: "/",
