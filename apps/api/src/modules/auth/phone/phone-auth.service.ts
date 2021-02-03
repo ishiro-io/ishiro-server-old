@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import parsePhoneNumber from "libphonenumber-js";
-import * as ms from "ms";
-import * as twilio from "twilio";
+import ms from "ms";
+import twilio from "twilio";
 import { Repository } from "typeorm";
 
 import { PHONE_NUMBER_CONFIRMATION_PREFIX } from "@ishiro/api/constants/redisPrefixes";
@@ -60,7 +60,7 @@ export class PhoneAuthService {
   async connect(
     { phoneNumber, code }: PhoneConnectInput,
     ctx: IshiroContext
-  ): Promise<PhoneConnectOutput | null> {
+  ): Promise<PhoneConnectOutput> {
     const check = await this.checkConfirmationCode(phoneNumber, code);
 
     if (!check) return null;
@@ -78,7 +78,7 @@ export class PhoneAuthService {
   async register(
     { username, phoneNumber, code }: PhoneRegisterInput,
     ctx: IshiroContext
-  ): Promise<User | null> {
+  ): Promise<User> {
     const check = await this.checkConfirmationCode(phoneNumber, code);
 
     if (!check) return null;

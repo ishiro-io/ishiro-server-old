@@ -20,7 +20,7 @@ export class GoogleAuthService {
   async connect(
     { accountId }: GoogleConnectInput,
     ctx: IshiroContext
-  ): Promise<GoogleConnectOutput | null> {
+  ): Promise<GoogleConnectOutput> {
     const auth = await this.userGoogleAuthRepository.findOne({
       where: { accountId },
       relations: ["user"],
@@ -34,7 +34,7 @@ export class GoogleAuthService {
   async register(
     { username, accountId }: GoogleRegisterInput,
     ctx: IshiroContext
-  ): Promise<User | null> {
+  ): Promise<User> {
     const user = await this.userRepository.create({ username }).save();
 
     await this.userGoogleAuthRepository.create({ accountId, user }).save();

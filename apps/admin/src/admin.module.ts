@@ -23,4 +23,4 @@ import { EpisodeModule } from "./modules/episodes/episode.module";
     }),
   ],
 })
-export class AppModule {}
+export class AdminModule {}

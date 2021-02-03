@@ -20,7 +20,7 @@ export class UserResolver {
     { username }: UpdateUsernameInput,
     @CurrentUser() user: User,
     @Context() ctx: IshiroContext
-  ): Promise<User | null> {
+  ): Promise<User> {
     const newUser = await this.userService.updateUsername(user.id, username);
 
     ctx.req.session.user = newUser;

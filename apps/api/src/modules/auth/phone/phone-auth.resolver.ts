@@ -28,7 +28,7 @@ export class PhoneAuthResolver {
     @Args("input")
     input: PhoneConnectInput,
     @Context() ctx: IshiroContext
-  ): Promise<PhoneConnectOutput | null> {
+  ): Promise<PhoneConnectOutput> {
     return this.phoneAuthService.connect(input, ctx);
   }
 

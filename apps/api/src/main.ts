@@ -3,9 +3,9 @@ import "@ishiro/libs/utils/env";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
-import * as connectRedis from "connect-redis";
-import * as session from "express-session";
-import * as ms from "ms";
+import connectRedis from "connect-redis";
+import session from "express-session";
+import ms from "ms";
 
 import { redisClient } from "@ishiro/api/redis/client";
 
