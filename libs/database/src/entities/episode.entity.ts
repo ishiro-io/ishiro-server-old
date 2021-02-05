@@ -24,6 +24,14 @@ export default class Episode extends BaseEntity {
   @Column({ nullable: true })
   airedDate?: string;
 
+  @Field({ defaultValue: false })
+  @Column()
+  isFiller: boolean;
+
+  @Field({ defaultValue: false })
+  @Column()
+  isRecap: boolean;
+
   @Field(() => Anime)
   @ManyToOne(() => Anime, (anime) => anime.episodes)
   anime: Anime;

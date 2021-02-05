@@ -19,6 +19,12 @@ export class CreateEpisodeInput {
 
   @Field({ nullable: true })
   airedDate?: string;
+
+  @Field({ defaultValue: false })
+  isFiller: boolean;
+
+  @Field({ defaultValue: false })
+  isRecap: boolean;
 }
 
 @InputType()

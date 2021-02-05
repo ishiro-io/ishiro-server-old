@@ -155,6 +155,8 @@ export class ExternalAPIService {
             title: e.title,
             number: e.episode_id,
             airedDate: e.aired as any,
+            isFiller: e.filler,
+            isRecap: e.recap,
           };
 
           return input;
