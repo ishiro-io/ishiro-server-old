@@ -21,7 +21,10 @@ export class EpisodeService {
   }
 
   findAllFromAnime(animeId: number): Promise<Episode[]> {
-    return this.episodeRepository.find({ where: { anime: animeId } });
+    return this.episodeRepository.find({
+      where: { anime: animeId },
+      order: { number: "ASC" },
+    });
   }
 
   findById(id: number): Promise<Episode> {
