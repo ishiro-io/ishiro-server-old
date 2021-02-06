@@ -1,20 +1,23 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsMobilePhone } from "class-validator";
 
-import { IS_USERNAME_ALREADY_EXIST_ERROR } from "@ishiro/api/constants/errorMessages";
+import {
+  INVALID_PHONE_NUMBER_ERROR,
+  IS_USERNAME_ALREADY_EXIST_ERROR,
+} from "@ishiro/api/constants/errorMessages";
 import { IsUsernameAlreadyExist } from "@ishiro/api/validators";
+import { IsMobilePhone } from "@ishiro/api/validators/isMobilePhone";
 
 @InputType()
 export class PhoneAskConfirmationCodeInput {
   @Field()
-  @IsMobilePhone("fr-FR")
+  @IsMobilePhone({ message: INVALID_PHONE_NUMBER_ERROR })
   phoneNumber: string;
 }
 
 @InputType()
 export class PhoneConnectInput {
   @Field()
-  @IsMobilePhone("fr-FR")
+  @IsMobilePhone({ message: INVALID_PHONE_NUMBER_ERROR })
   phoneNumber: string;
 
   @Field()
@@ -24,7 +27,7 @@ export class PhoneConnectInput {
 @InputType()
 export class PhoneRegisterInput {
   @Field()
-  @IsMobilePhone("fr-FR")
+  @IsMobilePhone({ message: INVALID_PHONE_NUMBER_ERROR })
   phoneNumber: string;
 
   @Field()

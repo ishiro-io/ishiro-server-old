@@ -30,6 +30,8 @@ export class PhoneAuthService {
   );
 
   async askConfirmationCode(phoneNumber: string): Promise<boolean> {
+    if (phoneNumber === process.env.DEMO_PHONE_NUMBER) return true;
+
     try {
       const code = await this.createConfirmationCode(
         phoneNumber,
@@ -50,6 +52,12 @@ export class PhoneAuthService {
     phoneNumber: string,
     code: string
   ): Promise<boolean> {
+    if (
+      phoneNumber === process.env.DEMO_PHONE_NUMBER &&
+      code === process.env.DEMO_PHONE_CODE
+    )
+      return true;
+
     const storedPhoneNumber = await redisClient.get(
       PHONE_NUMBER_CONFIRMATION_PREFIX + code
     );
