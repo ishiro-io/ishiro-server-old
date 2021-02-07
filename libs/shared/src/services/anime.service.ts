@@ -55,12 +55,13 @@ export class AnimeService {
       .createQueryBuilder("anime")
       .leftJoinAndSelect("anime.categories", "category")
       .leftJoinAndSelect("anime.episodes", "episodes")
+      .where("anime.AniDBRating IS NOT NULL")
       .take(options.limit + 1)
       .skip(options.offset)
       .orderBy("anime.AniDBRating", "DESC");
 
     if (categoryId)
-      queryBuilder.where("category.id = :categoryId", {
+      queryBuilder.andWhere("category.id = :categoryId", {
         categoryId,
       });
 

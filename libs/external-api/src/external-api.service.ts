@@ -5,7 +5,6 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { gql, rawRequest } from "graphql-request";
 
-import unusedCategoryName from "@ishiro/libs/shared/data/unused-category-name";
 import { AnimeType, RelationSource } from "@ishiro/libs/shared/enums";
 import {
   CreateAnimeInput,
@@ -52,6 +51,10 @@ export class ExternalApiService {
     if (httpJob) this.httpClient.callRequest(httpJob);
   }
 
+  isUDPClientUp() {
+    return this.udpClient.up;
+  }
+
   async getRelationIds(id: number, source: RelationSource) {
     axiosRetry(axios, { retries: 5 });
 
@@ -63,18 +66,20 @@ export class ExternalApiService {
   }
 
   async buildNewAnimeInput(
-    id: number,
+    aid: number,
     doTranslateDescription = false,
     doPopulateEpisodes = false
   ): Promise<NewAnimeInputs> {
-    const adbAnime = await this.httpClient.getAnimeById(id);
+    const adbAnime = await this.httpClient.getAnimeById(aid);
 
-    this.logger.debug(`Build new anime input (aid: ${id})`);
+    this.logger.debug(`Build new anime input (aid: ${aid})`);
 
-    const aniListId = await this.getRelationIds(id, RelationSource.anidb);
-    if (!aniListId) return null;
+    if (!adbAnime.anilistid) {
+      this.logger.error(`Cannot find anilist id for (aid: ${aid})`);
+      return null;
+    }
 
-    const aniListData = await this.getAniListData(aniListId);
+    const aniListData = await this.getAniListData(adbAnime.anilistid);
 
     const categories = aniListData
       ? [
@@ -184,6 +189,10 @@ export class ExternalApiService {
     return aniListData;
   }
 
+  getCalendarFields() {
+    return this.udpClient.getCalendar();
+  }
+
   private async getCategoryId(name: string): Promise<number> {
     switch (name) {
       case "Comedy":
@@ -291,8 +300,6 @@ export class ExternalApiService {
         return this.categoryService.findIdFromName("Cuisine");
 
       default:
-        if (!unusedCategoryName.find((n) => n === name))
-          this.logger.warn(`Category not found - ${name}`);
         return 0;
     }
   }

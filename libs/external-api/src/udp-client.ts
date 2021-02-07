@@ -2,6 +2,8 @@ import dgram from "dgram";
 
 import { Logger } from "@nestjs/common";
 
+import ADBCalendarField from "./types/ADBCalendarField";
+
 class UDPClient {
   private readonly logger: Logger = new Logger("AniDB UDP Client");
 
@@ -27,6 +29,8 @@ class UDPClient {
       this.jobs.push({
         request: `AUTH user=${auth.username}&pass=${auth.password}&protover=${auth.protover}&client=${auth.client}&clientver=${auth.clientver}&enc=UTF-8`,
         callback: (msg: string) => {
+          this.logger.log(`Server response: ${msg}`);
+
           const res = msg.split(" ");
 
           const statusCode = res[0];
@@ -48,8 +52,6 @@ class UDPClient {
   public callRequest(request: string, callback: Function) {
     this.socket.once("message", (msg) => {
       const data = msg.toString();
-      this.logger.log(`Received from server: ${data}`);
-
       callback(data, null);
     });
 
@@ -57,6 +59,22 @@ class UDPClient {
       this.logger.log(`Sent Request: ${request}`);
 
       if (error) callback(null, error);
+    });
+  }
+
+  public getCalendar(): Promise<ADBCalendarField[]> {
+    return new Promise((resolve) => {
+      this.jobs.push({
+        request: `CALENDAR s=${this.sessionId}`,
+        callback: (message) => {
+          const res = message.split("\n");
+          res.shift();
+
+          const fields = res.map((r) => new ADBCalendarField(r));
+
+          resolve(fields);
+        },
+      });
     });
   }
 

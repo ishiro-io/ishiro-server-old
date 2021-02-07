@@ -62,8 +62,9 @@ class HTTPClient {
       this.jobs.push({
         request: "anime",
         params: { aid: id },
-        callback: (data: string) => {
-          const anime = new ADBAnime(data);
+        callback: async (data: string) => {
+          const anime = new ADBAnime();
+          await anime.init(data);
 
           resolve(anime);
         },

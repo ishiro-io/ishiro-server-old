@@ -106,6 +106,32 @@ export class AnimeResolver {
     };
   }
 
+  @Mutation(() => Anime, { nullable: true })
+  async populateAnimeForAniDB(
+    @Args("aid")
+    aid: number
+  ): Promise<Anime> {
+    const input = await this.externalAPIService.buildNewAnimeInput(
+      aid,
+      true,
+      true
+    );
+
+    if (!input) return null;
+
+    const anime = await this.animeService.createAnime(input.animeInput);
+
+    if (input.episodeInputs) {
+      const inputs = input.episodeInputs.map((i) => {
+        return { ...i, animeId: anime.id };
+      });
+
+      await this.episodeService.createEpisodes(inputs, anime.id);
+    }
+
+    return anime;
+  }
+
   @ResolveField(() => Int)
   episodeCount(@Parent() anime: Anime): number {
     return anime.episodes.length;
