@@ -15,16 +15,16 @@ export class CreateEpisodeInput {
   arcName?: string;
 
   @Field({ nullable: true })
-  thumbnail?: string;
-
-  @Field({ nullable: true })
   airedDate?: string;
 
-  @Field({ defaultValue: false })
-  isFiller: boolean;
+  @Field({ nullable: true })
+  length?: number;
 
   @Field({ defaultValue: false })
-  isRecap: boolean;
+  isFiller?: boolean;
+
+  @Field({ defaultValue: false })
+  isRecap?: boolean;
 }
 
 @InputType()
@@ -40,4 +40,13 @@ export class UpdateEpisodeInput {
 
   @Field({ nullable: true })
   airedDate?: string;
+
+  @Field({ nullable: true })
+  length?: number;
+
+  @Field({ nullable: true })
+  isFiller?: boolean;
+
+  @Field({ nullable: true })
+  isRecap?: boolean;
 }

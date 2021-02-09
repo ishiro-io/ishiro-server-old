@@ -24,12 +24,16 @@ export default class Episode extends BaseEntity {
   @Column({ nullable: true })
   airedDate?: string;
 
-  @Field({ defaultValue: false })
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  length?: number;
+
+  @Field()
+  @Column({ default: false })
   isFiller: boolean;
 
-  @Field({ defaultValue: false })
-  @Column()
+  @Field()
+  @Column({ default: false })
   isRecap: boolean;
 
   @Field(() => Anime)

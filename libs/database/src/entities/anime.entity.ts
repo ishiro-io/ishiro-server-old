@@ -1,7 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 
-import { AnimeStatus, AnimeType } from "@ishiro/libs/shared/enums";
+import { AnimeType } from "@ishiro/libs/shared/enums";
 
 import BaseEntity from "./base-entity";
 import { Category, Episode } from ".";
@@ -11,7 +11,7 @@ import { Category, Episode } from ".";
 export default class Anime extends BaseEntity {
   @Field()
   @Column({ unique: true, nullable: true })
-  idMAL?: number;
+  idAniDB?: number;
 
   @Field()
   @Column({ unique: true })
@@ -23,7 +23,11 @@ export default class Anime extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  titleJapanese?: string;
+  titleRomaji?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  titleKanji?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -39,15 +43,11 @@ export default class Anime extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ type: "float", nullable: true })
-  MALRating?: number;
+  AniDBRating?: number;
 
   @Field(() => AnimeType)
   @Column({ type: "enum", enum: AnimeType })
   type: AnimeType;
-
-  @Field(() => AnimeStatus)
-  @Column({ type: "enum", enum: AnimeStatus, default: AnimeStatus.ONGOING })
-  status: AnimeStatus;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -67,10 +67,6 @@ export default class Anime extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  duration?: string;
-
-  @Field()
-  @Column()
   isAdult: boolean;
 
   @Field(() => [Category])

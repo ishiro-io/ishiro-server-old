@@ -13,13 +13,30 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@ishiro/admin/*": ["apps/admin/src/*"],
-      "@ishiro/api/*": ["apps/api/src/*"],
-      "@ishiro/scheduler/*": ["apps/scheduler/src/*"],
-      "@ishiro/libs/database/*": ["libs/database/src/*"],
-      "@ishiro/libs/shared/*": ["libs/shared/src/*"],
-      "@ishiro/libs/utils": ["libs/utils/src"],
-      "@ishiro/libs/utils/*": ["libs/utils/src/*"]
+      "@ishiro/admin/*": [
+        "apps/admin/src/*"
+      ],
+      "@ishiro/api/*": [
+        "apps/api/src/*"
+      ],
+      "@ishiro/scheduler/*": [
+        "apps/scheduler/src/*"
+      ],
+      "@ishiro/libs/database/*": [
+        "libs/database/src/*"
+      ],
+      "@ishiro/libs/external-api/*": [
+        "libs/external-api/src/*"
+      ],
+      "@ishiro/libs/shared/*": [
+        "libs/shared/src/*"
+      ],
+      "@ishiro/libs/utils": [
+        "libs/utils/src"
+      ],
+      "@ishiro/libs/utils/*": [
+        "libs/utils/src/*"
+      ]
     }
   }
 }

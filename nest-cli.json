@@ -59,6 +59,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/utils/tsconfig.lib.json"
       }
+    },
+    "external-api": {
+      "type": "library",
+      "root": "libs/external-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/external-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/external-api/tsconfig.lib.json"
+      }
     }
   }
 }

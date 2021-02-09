@@ -1,6 +1,4 @@
-import { Field, InputType, ObjectType } from "@nestjs/graphql";
-
-import { Anime } from "@ishiro/libs/database/entities";
+import { Field, InputType } from "@nestjs/graphql";
 
 @InputType()
 export class PopulateAnimesInput {
@@ -15,13 +13,4 @@ export class PopulateAnimesInput {
 
   @Field({ nullable: true, defaultValue: true })
   doTranslateDescription: boolean;
-}
-
-@ObjectType()
-export class PopulatedAnimesOutput {
-  @Field()
-  timeToPopulate: string;
-
-  @Field(() => [Anime])
-  fields: Anime[];
 }

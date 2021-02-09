@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from "@nestjs/common";
+import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import Fuse from "fuse.js";
 import ms from "ms";
@@ -23,6 +23,8 @@ export class AnimeService {
     @Inject(forwardRef(() => EpisodeService))
     private readonly episodeService: EpisodeService
   ) {}
+
+  private readonly logger = new Logger(AnimeService.name);
 
   findAll(): Promise<Anime[]> {
     return this.animeRepository.find({ relations: ["categories", "episodes"] });
@@ -76,7 +78,7 @@ export class AnimeService {
     input: SearchAnimesInput
   ): Promise<AnimesOutput> {
     const animes = await Anime.find({
-      order: { MALRating: "DESC" },
+      order: { AniDBRating: "DESC" },
       cache: ms("1d"),
     });
 
@@ -99,6 +101,7 @@ export class AnimeService {
   }
 
   async createAnime(data: CreateAnimeInput): Promise<Anime> {
+    this.logger.debug(`Create anime ${data.title} (aid: ${data.idAniDB})`);
     const check = await this.animeRepository.findOne({
       where: { title: data.title },
     });

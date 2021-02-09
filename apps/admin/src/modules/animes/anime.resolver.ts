@@ -11,22 +11,22 @@ import {
 import { mapSeries } from "async";
 import { format } from "date-fns";
 
-import idsMALList from "@ishiro/admin/data/mal-ids-list";
 import { Anime } from "@ishiro/libs/database/entities";
+import animeIds from "@ishiro/libs/external-api/data/anime-ids";
+import { ExternalApiService } from "@ishiro/libs/external-api/external-api.service";
 import { CreateAnimeInput, UpdateAnimeInput } from "@ishiro/libs/shared/inputs";
 import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
 import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
-import { ExternalAPIService } from "@ishiro/libs/shared/services/external-api.service";
-import { delay } from "@ishiro/libs/utils";
 
-import { PopulateAnimesInput, PopulatedAnimesOutput } from "./anime.input";
+import { PopulateAnimesInput } from "./anime.input";
+import { PopulatedAnimesOutput } from "./anime.output";
 
 @Resolver(() => Anime)
 export class AnimeResolver {
   constructor(
     private readonly animeService: AnimeService,
-    @Inject(forwardRef(() => ExternalAPIService))
-    private readonly externalAPIService: ExternalAPIService,
+    @Inject(forwardRef(() => ExternalApiService))
+    private readonly externalAPIService: ExternalApiService,
     @Inject(forwardRef(() => EpisodeService))
     private readonly episodeService: EpisodeService
   ) {}
@@ -68,38 +68,31 @@ export class AnimeResolver {
   ): Promise<PopulatedAnimesOutput> {
     const startTime = Date.now();
 
-    const idsMAL = idsMALList.slice(offset, animeAmount + offset);
+    const ids = animeIds.slice(offset, animeAmount + offset);
 
-    const inputs = await mapSeries<any, CreateAnimeInput>(
-      idsMAL,
-      async (id) => {
-        await delay(5000);
-        return this.externalAPIService.buildNewAnimeInput(
+    const animes = (
+      await mapSeries<any, Anime>(ids, async (id) => {
+        const input = await this.externalAPIService.buildNewAnimeInput(
           id,
-          doTranslateDescription
-        );
-      }
-    );
-
-    const animes = await mapSeries<any, Anime>(inputs, async (input) => {
-      const anime = await this.animeService.createAnime(input);
-      return anime;
-    });
-
-    if (doPopulateEpisodes) {
-      await mapSeries(animes, async (a) => {
-        const episodeInputs = await this.externalAPIService.buildAnimeEpisodesInput(
-          a.idMAL,
-          a.id
+          doTranslateDescription,
+          doPopulateEpisodes
         );
 
-        await mapSeries(episodeInputs, async (input) => {
-          const episode = await this.episodeService.createEpisode(input);
+        if (!input) return null;
 
-          return episode;
-        });
-      });
-    }
+        const anime = await this.animeService.createAnime(input.animeInput);
+
+        if (input.episodeInputs) {
+          const inputs = input.episodeInputs.map((i) => {
+            return { ...i, animeId: anime.id };
+          });
+
+          await this.episodeService.createEpisodes(inputs, anime.id);
+        }
+
+        return anime;
+      })
+    ).filter((a) => a !== null);
 
     const fields = await mapSeries<Anime, Anime>(animes, async (a) => {
       return this.animeService.findById(a.id);

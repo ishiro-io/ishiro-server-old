@@ -1,5 +1,6 @@
-import { Inject, Injectable, forwardRef } from "@nestjs/common";
+import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { mapSeries } from "async";
 import { In, Repository } from "typeorm";
 
 import { Episode } from "@ishiro/libs/database/entities";
@@ -15,6 +16,8 @@ export class EpisodeService {
     @Inject(forwardRef(() => AnimeService))
     private readonly animeService: AnimeService
   ) {}
+
+  private readonly logger = new Logger(EpisodeService.name);
 
   findAll(): Promise<Episode[]> {
     return this.episodeRepository.find();
@@ -40,6 +43,10 @@ export class EpisodeService {
   }
 
   async createEpisode(data: CreateEpisodeInput): Promise<Episode> {
+    this.logger.debug(
+      `Create episode ${data.number} (anime.id: ${data.animeId})`
+    );
+
     const check = await this.episodeRepository.findOne({
       where: { number: data.number, anime: data.animeId },
       relations: ["anime"],
@@ -54,6 +61,46 @@ export class EpisodeService {
     episode.anime = anime;
 
     return episode.save();
+  }
+
+  async createEpisodes(
+    data: CreateEpisodeInput[],
+    animeId: number
+  ): Promise<Episode[]> {
+    this.logger.debug(`Create ${data.length} episodes (anime.id: ${animeId})`);
+
+    const checks = (
+      await mapSeries<CreateEpisodeInput, Episode>(data, async (input) => {
+        return this.episodeRepository.findOne({
+          where: { number: input.number, anime: animeId },
+          relations: ["anime"],
+        });
+      })
+    ).filter((e) => e !== undefined);
+
+    const toCreate = await data.filter((input) => {
+      return !checks.find(
+        (c) => c.number === input.number && c.anime.id === animeId
+      );
+    });
+
+    const createdEpisodes = await this.episodeRepository.create(toCreate);
+
+    const episodes = await mapSeries<Episode, Episode>(
+      createdEpisodes,
+      async (e) => {
+        const anime = await this.animeService.findById(animeId);
+
+        e.anime = anime;
+        return e;
+      }
+    );
+
+    await Episode.save(episodes);
+
+    const fields = [...episodes, ...checks].sort((a, b) => a.number - b.number);
+
+    return fields;
   }
 
   async updateEpisode(id: number, data: UpdateEpisodeInput): Promise<Episode> {
