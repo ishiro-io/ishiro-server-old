@@ -57,7 +57,7 @@ export class AnimeService {
       .leftJoinAndSelect("anime.episodes", "episodes")
       .take(options.limit + 1)
       .skip(options.offset)
-      .orderBy("anime.MALRating", "DESC");
+      .orderBy("anime.AniDBRating", "DESC");
 
     if (categoryId)
       queryBuilder.where("category.id = :categoryId", {
@@ -83,7 +83,7 @@ export class AnimeService {
     });
 
     const fuse = new Fuse(animes, {
-      keys: ["title", "titleEnglish", "titleJapanese"],
+      keys: ["title", "titleEnglish", "titleRomaji", "titleKanji"],
       threshold: 0.35,
     });
 

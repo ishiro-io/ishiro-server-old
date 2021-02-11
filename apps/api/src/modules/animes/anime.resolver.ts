@@ -6,8 +6,10 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { isFuture, isPast, parseISO } from "date-fns";
 
 import { Anime } from "@ishiro/libs/database/entities";
+import { AnimeStatus } from "@ishiro/libs/shared/enums";
 import { PaginationInput } from "@ishiro/libs/shared/inputs";
 import { SearchAnimesInput } from "@ishiro/libs/shared/inputs/anime.input";
 import { AnimesOutput } from "@ishiro/libs/shared/outputs";
@@ -51,8 +53,45 @@ export class AnimeResolver {
     return anime.episodes.length;
   }
 
+  @ResolveField(() => Int)
+  averageDuration(@Parent() anime: Anime): number {
+    const occurrences = anime.episodes.reduce<Occurrence[]>(
+      (array, episode) => {
+        const newArray = [...array];
+        const occurenceIndex = newArray.findIndex(
+          (o) => o.length === episode.length
+        );
+
+        if (occurenceIndex > -1) newArray[occurenceIndex].count += 1;
+        else newArray.push({ count: 1, length: episode.length });
+
+        return newArray;
+      },
+      []
+    );
+
+    const maxCount = Math.max(...occurrences.map((o) => o.count));
+    const index = occurrences.findIndex((o) => o.count === maxCount);
+
+    return occurrences[index].length;
+  }
+
+  @ResolveField(() => AnimeStatus)
+  status(@Parent() anime: Anime): AnimeStatus {
+    const { releaseDate, endDate } = anime;
+
+    if (isFuture(parseISO(releaseDate))) return AnimeStatus.COMING_SOON;
+    if (isPast(parseISO(endDate))) return AnimeStatus.FINISHED;
+    return AnimeStatus.ONGOING;
+  }
+
   @ResolveField(() => [Arc], { name: "arcs", nullable: true })
   getArcs(@Parent() anime: Anime): Promise<Arc[]> {
     return this.animeService.getArcs(anime);
   }
+}
+
+interface Occurrence {
+  length: number;
+  count: number;
 }
