@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { mapSeries } from "async";
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import { gql, rawRequest } from "graphql-request";
 
 import unusedCategoryName from "@ishiro/libs/shared/data/unused-category-name";
@@ -52,6 +53,8 @@ export class ExternalApiService {
   }
 
   async getRelationIds(id: number, source: RelationSource) {
+    axiosRetry(axios, { retries: 5 });
+
     const response = await axios.get(
       `${process.env.RELATIONS_API_ENDPOINT}?source=${source}&id=${id}`
     );
@@ -68,9 +71,7 @@ export class ExternalApiService {
 
     this.logger.debug(`Build new anime input (aid: ${id})`);
 
-    const aniListId = (await this.getRelationIds(id, RelationSource.anidb))
-      .anilist;
-
+    const aniListId = await this.getRelationIds(id, RelationSource.anidb);
     if (!aniListId) return null;
 
     const aniListData = await this.getAniListData(aniListId);
