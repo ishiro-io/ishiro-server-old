@@ -5,6 +5,8 @@ import ADBEpisode from "./ADBEpisodes";
 class ADBAnime {
   aid: number;
 
+  titleFrench: string;
+
   type: string;
 
   startDate: string;
@@ -24,7 +26,12 @@ class ADBAnime {
         .sort((a, b) => Number(a.epno?.[0]._) - Number(b.epno[0]._))
         .map((e) => new ADBEpisode(e));
 
+      const titleFrench = anime.titles[0].title.find(
+        (t) => t?.$["xml:lang"] === "fr"
+      )?._;
+
       this.aid = anime?.$?.id;
+      this.titleFrench = titleFrench;
       this.type = anime?.type?.[0];
       this.startDate = anime?.startdate?.[0];
       this.endDate = anime?.enddate?.[0];
