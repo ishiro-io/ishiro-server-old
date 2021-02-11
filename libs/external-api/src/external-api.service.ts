@@ -113,10 +113,17 @@ export class ExternalApiService {
     };
 
     let episodeInputs: CreateEpisodeInput[];
-    if (doPopulateEpisodes && animeInput.type !== AnimeType.MOVIE) {
-      episodeInputs = adbAnime.episodes.map<CreateEpisodeInput>((e) =>
-        this.buildEpisodeInput(e)
-      );
+    if (doPopulateEpisodes) {
+      if (animeInput.type === AnimeType.MOVIE) {
+        const fullMovie = adbAnime.episodes.find(
+          (e) => e.title === "Complete Movie"
+        );
+        episodeInputs = [this.buildEpisodeInput(fullMovie)];
+      } else {
+        episodeInputs = adbAnime.episodes.map<CreateEpisodeInput>((e) =>
+          this.buildEpisodeInput(e)
+        );
+      }
     }
 
     return { animeInput, episodeInputs };

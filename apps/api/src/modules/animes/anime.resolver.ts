@@ -55,6 +55,8 @@ export class AnimeResolver {
 
   @ResolveField(() => Int)
   averageDuration(@Parent() anime: Anime): number {
+    if (anime.episodes.length <= 0) return 0;
+
     const occurrences = anime.episodes.reduce<Occurrence[]>(
       (array, episode) => {
         const newArray = [...array];
