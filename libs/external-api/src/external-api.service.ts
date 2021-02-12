@@ -1,3 +1,4 @@
+import { v2 } from "@google-cloud/translate";
 import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { mapSeries } from "async";
@@ -17,6 +18,9 @@ import sleep from "@ishiro/libs/utils/sleep";
 import HTTPClient from "./http-client";
 import ADBEpisode from "./types/ADBEpisodes";
 import UDPClient from "./udp-client";
+
+const { Translate } = v2;
+const translate = new Translate({ key: process.env.GOOGLE_TRANSLATE_API_KEY });
 
 @Injectable()
 export class ExternalApiService {
@@ -83,6 +87,19 @@ export class ExternalApiService {
 
     const aniListData = await this.getAniListData(adbAnime.anilistid);
 
+    const descText = aniListData?.Media?.description.replace(
+      /(<([^>]+)>)/gi,
+      ""
+    );
+
+    const [description] =
+      doTranslateDescription && process.env.NODE_ENV === "production"
+        ? await translate.translate(
+            `${descText}\n[Description traduite automatiquement]`,
+            "fr"
+          )
+        : [descText];
+
     const categories = aniListData
       ? [
           ...aniListData?.Media?.genres,
@@ -111,7 +128,7 @@ export class ExternalApiService {
         aniListData?.Media?.coverImage?.extraLarge ||
         aniListData?.Media?.coverImage?.large,
       bannerImage: aniListData?.Media?.bannerImage,
-      description: aniListData?.Media?.description,
+      description,
       aniDBRating: adbAnime.rating,
       type: this.getType(adbAnime.type),
       releaseDate: adbAnime.startDate,

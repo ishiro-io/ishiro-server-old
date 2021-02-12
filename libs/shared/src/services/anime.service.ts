@@ -115,6 +115,7 @@ export class AnimeService {
     if (anime) {
       const updateData = { ...data };
       delete updateData.categoriesIds;
+      delete updateData.description;
       await this.animeRepository.update(anime.id, updateData);
 
       anime = await this.animeRepository.findOne({
