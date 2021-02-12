@@ -13,10 +13,7 @@ export class UpdatedAnimesTask {
     private readonly externalAPIService: ExternalApiService,
     @Inject(forwardRef(() => AnimeService))
     private readonly animeService: AnimeService
-  ) {
-    if ((process.env.SCHEDULER_UPDATED_ANIMES_ON_START as unknown) as boolean)
-      this.handleCron();
-  }
+  ) {}
 
   private readonly logger = new Logger(UpdatedAnimesTask.name);
 
