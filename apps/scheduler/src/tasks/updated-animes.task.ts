@@ -7,33 +7,31 @@ import { ExternalApiService } from "@ishiro/libs/external-api/external-api.servi
 import { AnimeService } from "@ishiro/libs/shared/services";
 
 @Injectable()
-export class CalendarTask {
+export class UpdatedAnimesTask {
   constructor(
     @Inject(forwardRef(() => ExternalApiService))
     private readonly externalAPIService: ExternalApiService,
     @Inject(forwardRef(() => AnimeService))
     private readonly animeService: AnimeService
   ) {
-    if ((process.env.SCHEDULER_CALENDAR_ON_START as unknown) as boolean)
+    if ((process.env.SCHEDULER_UPDATED_ANIMES_ON_START as unknown) as boolean)
       this.handleCron();
   }
 
-  private readonly logger = new Logger(CalendarTask.name);
+  private readonly logger = new Logger(UpdatedAnimesTask.name);
 
-  @Cron("0 0 12 1/2 * *")
+  @Cron("0 0 0 1/1 * *")
   async handleCron() {
     await this.externalAPIService.isUDPClientUp();
 
-    this.logger.debug("Start recovering new data from calendar");
+    this.logger.debug("Start recovering updated animes");
 
-    const fields = await this.externalAPIService.getCalendarFields();
-
-    const ids = fields.map((f) => f.aid);
+    const ids = await this.externalAPIService.getUpdatedAnimeIds();
 
     await mapSeries<any, Anime>(ids, async (id) => {
       return this.animeService.populateAnime(id);
     });
 
-    this.logger.debug("Finished recovering new data from calendar");
+    this.logger.debug("Finished recovering updated animes");
   }
 }

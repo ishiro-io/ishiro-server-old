@@ -69,36 +69,36 @@ export class EpisodeService {
   ): Promise<Episode[]> {
     this.logger.debug(`Create ${data.length} episodes (anime.id: ${animeId})`);
 
-    const checks = (
+    const anime = await this.animeService.findById(animeId);
+
+    const episodes = (
       await mapSeries<CreateEpisodeInput, Episode>(data, async (input) => {
-        return this.episodeRepository.findOne({
+        let episode = await this.episodeRepository.findOne({
           where: { number: input.number, anime: animeId },
           relations: ["anime"],
         });
+
+        if (episode) {
+          const updateInput = { ...input };
+          delete updateInput.animeId;
+          await this.episodeRepository.update(episode.id, updateInput);
+
+          episode = await this.episodeRepository.findOne({
+            where: { number: input.number, anime: animeId },
+            relations: ["anime"],
+          });
+        } else {
+          episode = await this.episodeRepository.create(input);
+          episode.anime = anime;
+        }
+
+        return episode;
       })
     ).filter((e) => e !== undefined);
 
-    const toCreate = await data.filter((input) => {
-      return !checks.find(
-        (c) => c.number === input.number && c.anime.id === animeId
-      );
-    });
-
-    const createdEpisodes = await this.episodeRepository.create(toCreate);
-
-    const episodes = await mapSeries<Episode, Episode>(
-      createdEpisodes,
-      async (e) => {
-        const anime = await this.animeService.findById(animeId);
-
-        e.anime = anime;
-        return e;
-      }
-    );
-
     await Episode.save(episodes);
 
-    const fields = [...episodes, ...checks].sort((a, b) => a.number - b.number);
+    const fields = episodes.sort((a, b) => a.number - b.number);
 
     return fields;
   }

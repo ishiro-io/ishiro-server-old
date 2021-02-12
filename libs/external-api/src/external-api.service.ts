@@ -4,6 +4,7 @@ import { mapSeries } from "async";
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { gql, rawRequest } from "graphql-request";
+import ms from "ms";
 
 import { AnimeType, RelationSource } from "@ishiro/libs/shared/enums";
 import {
@@ -11,6 +12,7 @@ import {
   CreateEpisodeInput,
 } from "@ishiro/libs/shared/inputs";
 import { CategoryService } from "@ishiro/libs/shared/services";
+import sleep from "@ishiro/libs/utils/sleep";
 
 import HTTPClient from "./http-client";
 import ADBEpisode from "./types/ADBEpisodes";
@@ -67,8 +69,8 @@ export class ExternalApiService {
 
   async buildNewAnimeInput(
     aid: number,
-    doTranslateDescription = false,
-    doPopulateEpisodes = false
+    doPopulateEpisodes = false,
+    doTranslateDescription = false
   ): Promise<NewAnimeInputs> {
     const adbAnime = await this.httpClient.getAnimeById(aid);
 
@@ -84,7 +86,7 @@ export class ExternalApiService {
     const categories = aniListData
       ? [
           ...aniListData?.Media?.genres,
-          ...aniListData?.Media?.tags.map((t) => t.name),
+          ...aniListData?.Media?.tags?.map((t) => t.name),
         ]
       : [];
 
@@ -110,7 +112,7 @@ export class ExternalApiService {
         aniListData?.Media?.coverImage?.large,
       bannerImage: aniListData?.Media?.bannerImage,
       description: aniListData?.Media?.description,
-      AniDBRating: adbAnime.rating,
+      aniDBRating: adbAnime.rating,
       type: this.getType(adbAnime.type),
       releaseDate: adbAnime.startDate,
       endDate: adbAnime.endDate,
@@ -119,12 +121,19 @@ export class ExternalApiService {
     };
 
     let episodeInputs: CreateEpisodeInput[];
-    if (doPopulateEpisodes) {
+    if (doPopulateEpisodes && adbAnime.episodes?.length > 0) {
       if (animeInput.type === AnimeType.MOVIE) {
-        const fullMovie = adbAnime.episodes.find(
+        const completeMovie = adbAnime.episodes.find(
           (e) => e.title === "Complete Movie"
         );
-        episodeInputs = [this.buildEpisodeInput(fullMovie)];
+
+        if (completeMovie) {
+          episodeInputs = [this.buildEpisodeInput(completeMovie)];
+        } else {
+          episodeInputs = adbAnime.episodes.map<CreateEpisodeInput>((e) =>
+            this.buildEpisodeInput(e)
+          );
+        }
       } else {
         episodeInputs = adbAnime.episodes.map<CreateEpisodeInput>((e) =>
           this.buildEpisodeInput(e)
@@ -171,7 +180,6 @@ export class ExternalApiService {
       }
     `;
 
-    let aniListData;
     try {
       const { data } = await rawRequest(
         "https://graphql.anilist.co",
@@ -181,16 +189,22 @@ export class ExternalApiService {
         }
       );
 
-      aniListData = data;
+      return data;
     } catch (error) {
       this.logger.error(error);
-    }
 
-    return aniListData;
+      await sleep(ms("10s"));
+
+      return this.getAniListData(id);
+    }
   }
 
   getCalendarFields() {
     return this.udpClient.getCalendar();
+  }
+
+  getUpdatedAnimeIds() {
+    return this.udpClient.getUpdatedAnimeIds();
   }
 
   private async getCategoryId(name: string): Promise<number> {
@@ -323,6 +337,9 @@ export class ExternalApiService {
 
       case "Music":
         return AnimeType.MUSIC;
+
+      case "Web":
+        return AnimeType.WEB;
 
       default:
         this.logger.warn(`Anime type not found => ${type}`);

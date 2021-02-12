@@ -72,25 +72,11 @@ export class AnimeResolver {
 
     const animes = (
       await mapSeries<any, Anime>(ids, async (id) => {
-        const input = await this.externalAPIService.buildNewAnimeInput(
+        return this.animeService.populateAnime(
           id,
-          doTranslateDescription,
-          doPopulateEpisodes
+          doPopulateEpisodes,
+          doTranslateDescription
         );
-
-        if (!input) return null;
-
-        const anime = await this.animeService.createAnime(input.animeInput);
-
-        if (input.episodeInputs) {
-          const inputs = input.episodeInputs.map((i) => {
-            return { ...i, animeId: anime.id };
-          });
-
-          await this.episodeService.createEpisodes(inputs, anime.id);
-        }
-
-        return anime;
       })
     ).filter((a) => a !== null);
 
@@ -107,29 +93,11 @@ export class AnimeResolver {
   }
 
   @Mutation(() => Anime, { nullable: true })
-  async populateAnimeForAniDB(
+  async populateAnime(
     @Args("aid")
     aid: number
   ): Promise<Anime> {
-    const input = await this.externalAPIService.buildNewAnimeInput(
-      aid,
-      true,
-      true
-    );
-
-    if (!input) return null;
-
-    const anime = await this.animeService.createAnime(input.animeInput);
-
-    if (input.episodeInputs) {
-      const inputs = input.episodeInputs.map((i) => {
-        return { ...i, animeId: anime.id };
-      });
-
-      await this.episodeService.createEpisodes(inputs, anime.id);
-    }
-
-    return anime;
+    return this.animeService.populateAnime(aid);
   }
 
   @ResolveField(() => Int)

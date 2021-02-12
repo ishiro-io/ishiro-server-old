@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
@@ -12,9 +13,11 @@ import {
 } from "@ishiro/libs/shared/services";
 
 import { CalendarTask } from "./tasks/calendar.task";
+import { UpdatedAnimesTask } from "./tasks/updated-animes.task";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     DatabaseModule,
     TypeOrmModule.forFeature([Anime, Category, Episode]),
@@ -25,6 +28,7 @@ import { CalendarTask } from "./tasks/calendar.task";
     CategoryService,
     EpisodeService,
     CalendarTask,
+    UpdatedAnimesTask,
   ],
 })
 export class SchedulerModule {}

@@ -39,6 +39,7 @@
     "class-methods-use-this": "off",
     "max-classes-per-file": "off",
     "no-async-promise-executor": "off",
+    "no-extra-boolean-cast": "off",
     "no-use-before-define": "off",
     "no-useless-constructor": "off",
     "no-shadow": "off",

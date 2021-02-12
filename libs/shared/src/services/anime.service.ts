@@ -5,6 +5,7 @@ import ms from "ms";
 import { In, Repository } from "typeorm";
 
 import { Anime } from "@ishiro/libs/database/entities";
+import { ExternalApiService } from "@ishiro/libs/external-api/external-api.service";
 
 import { CreateAnimeInput, PaginationInput, UpdateAnimeInput } from "../inputs";
 import { SearchAnimesInput } from "../inputs/anime.input";
@@ -21,7 +22,9 @@ export class AnimeService {
     @Inject(forwardRef(() => CategoryService))
     private readonly categoryService: CategoryService,
     @Inject(forwardRef(() => EpisodeService))
-    private readonly episodeService: EpisodeService
+    private readonly episodeService: EpisodeService,
+    @Inject(forwardRef(() => ExternalApiService))
+    private readonly externalAPIService: ExternalApiService
   ) {}
 
   private readonly logger = new Logger(AnimeService.name);
@@ -55,10 +58,10 @@ export class AnimeService {
       .createQueryBuilder("anime")
       .leftJoinAndSelect("anime.categories", "category")
       .leftJoinAndSelect("anime.episodes", "episodes")
-      .where("anime.AniDBRating IS NOT NULL")
+      .where("anime.aniDBRating IS NOT NULL")
       .take(options.limit + 1)
       .skip(options.offset)
-      .orderBy("anime.AniDBRating", "DESC");
+      .orderBy("anime.aniDBRating", "DESC");
 
     if (categoryId)
       queryBuilder.andWhere("category.id = :categoryId", {
@@ -79,7 +82,7 @@ export class AnimeService {
     input: SearchAnimesInput
   ): Promise<AnimesOutput> {
     const animes = await Anime.find({
-      order: { AniDBRating: "DESC" },
+      order: { aniDBRating: "DESC" },
       cache: ms("1d"),
     });
 
@@ -103,13 +106,23 @@ export class AnimeService {
 
   async createAnime(data: CreateAnimeInput): Promise<Anime> {
     this.logger.debug(`Create anime ${data.title} (aid: ${data.idAniDB})`);
-    const check = await this.animeRepository.findOne({
-      where: { title: data.title },
+    let anime = await this.animeRepository.findOne({
+      where: { idAniDB: data.idAniDB },
     });
 
-    if (check) return check;
+    // ? L'anime existe déja en base de donnée
+    // ? on le met à jour
+    if (anime) {
+      const updateData = { ...data };
+      delete updateData.categoriesIds;
+      await this.animeRepository.update(anime.id, updateData);
 
-    const anime = await this.animeRepository.create(data);
+      anime = await this.animeRepository.findOne({
+        where: { title: data.title },
+      });
+    } else {
+      anime = await this.animeRepository.create(data);
+    }
 
     if (data.categoriesIds?.length > 0) {
       const categories = await Promise.all(
@@ -126,6 +139,32 @@ export class AnimeService {
     await this.animeRepository.update(id, data);
 
     const anime = await this.animeRepository.findOneOrFail({ id });
+
+    return anime;
+  }
+
+  async populateAnime(
+    aid: number,
+    doPopulateEpisodes = true,
+    doTranslateDescription = true
+  ) {
+    const input = await this.externalAPIService.buildNewAnimeInput(
+      aid,
+      doPopulateEpisodes,
+      doTranslateDescription
+    );
+
+    if (!input) return null;
+
+    const anime = await this.createAnime(input.animeInput);
+
+    if (input.episodeInputs) {
+      const inputs = input.episodeInputs.map((i) => {
+        return { ...i, animeId: anime.id };
+      });
+
+      await this.episodeService.createEpisodes(inputs, anime.id);
+    }
 
     return anime;
   }

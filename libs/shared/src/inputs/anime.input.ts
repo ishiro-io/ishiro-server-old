@@ -30,7 +30,7 @@ export class CreateAnimeInput {
   description?: string;
 
   @Field({ nullable: true })
-  AniDBRating?: number;
+  aniDBRating?: number;
 
   @Field(() => AnimeType)
   type: AnimeType;
@@ -81,7 +81,7 @@ export class UpdateAnimeInput {
   description?: string;
 
   @Field({ nullable: true })
-  AniDBRating?: number;
+  aniDBRating?: number;
 
   @Field(() => AnimeType, { nullable: true })
   type?: AnimeType;

@@ -43,7 +43,7 @@ export default class Anime extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ type: "float", nullable: true })
-  AniDBRating?: number;
+  aniDBRating?: number;
 
   @Field(() => AnimeType)
   @Column({ type: "enum", enum: AnimeType })

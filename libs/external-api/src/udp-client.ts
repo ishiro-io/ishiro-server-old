@@ -78,6 +78,24 @@ class UDPClient {
     });
   }
 
+  public getUpdatedAnimeIds(): Promise<number[]> {
+    return new Promise((resolve) => {
+      this.jobs.push({
+        request: `UPDATED entity=1&age=1&s=${this.sessionId}`,
+        callback: (message) => {
+          const ids = message
+            .split("\n")[1]
+            .split("|")
+            .pop()
+            .split(",")
+            .map((id) => Number(id));
+
+          resolve(ids);
+        },
+      });
+    });
+  }
+
   public logout(): Promise<boolean> {
     return new Promise((resolve) => {
       this.jobs.push({

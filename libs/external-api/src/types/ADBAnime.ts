@@ -31,10 +31,10 @@ class ADBAnime {
 
     const episodes = anime.episodes?.[0].episode
       .filter((e) => !Number.isNaN(Number(e.epno?.[0]._)))
-      .sort((a, b) => Number(a.epno?.[0]._) - Number(b.epno[0]._))
+      .sort((a, b) => Number(a.epno?.[0]._) - Number(b.epno?.[0]._))
       .map((e) => new ADBEpisode(e));
 
-    const titleFrench = anime.titles[0].title.find(
+    const titleFrench = anime?.titles?.[0]?.title.find(
       (t) => t?.$["xml:lang"] === "fr"
     )?._;
 
@@ -55,7 +55,7 @@ class ADBAnime {
     if (aniDbRelationId) {
       this.anilistid = aniDbRelationId;
     } else {
-      const malResource = anime.resources[0].resource.find(
+      const malResource = anime.resources?.[0].resource.find(
         (r) => r.$.type === "2"
       );
 

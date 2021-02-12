@@ -59,6 +59,8 @@ export class AnimeResolver {
 
     const occurrences = anime.episodes.reduce<Occurrence[]>(
       (array, episode) => {
+        if (episode.length <= 0) return array;
+
         const newArray = [...array];
         const occurenceIndex = newArray.findIndex(
           (o) => o.length === episode.length

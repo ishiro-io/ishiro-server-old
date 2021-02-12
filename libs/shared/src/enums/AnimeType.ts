@@ -7,6 +7,7 @@ export enum AnimeType {
   OVA = "OVA",
   ONA = "ONA",
   MUSIC = "MUSIC",
+  WEB = "WEB",
 }
 
 registerEnumType(AnimeType, {
