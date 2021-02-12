@@ -101,4 +101,39 @@ export class EpisodeViewService {
 
     return this.userEpisodeViewRepository.save(episodesViews);
   }
+
+  async getEpisodeSeenCount(user: User): Promise<number> {
+    const queryBuilder = this.userEpisodeViewRepository.createQueryBuilder(
+      "uev"
+    );
+
+    const query = queryBuilder
+      .select("uev.id")
+      .leftJoin("uev.animeView", "uav")
+      .leftJoin("uav.user", "u")
+      .where("u.id = :userId", {
+        userId: user.id,
+      });
+
+    return query.getCount();
+  }
+
+  async getTotalSeenTime(user: User): Promise<number> {
+    const queryBuilder = this.userEpisodeViewRepository.createQueryBuilder(
+      "uev"
+    );
+
+    const query = queryBuilder
+      .select("SUM(e.length)", "sum")
+      .leftJoin("uev.episode", "e")
+      .leftJoin("uev.animeView", "uav")
+      .leftJoin("uav.user", "u")
+      .where("u.id = :userId", {
+        userId: user.id,
+      });
+
+    const { sum } = await query.getRawOne();
+
+    return sum;
+  }
 }

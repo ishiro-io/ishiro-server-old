@@ -21,6 +21,16 @@ export class AnimeViewService {
     private readonly userService: UserService
   ) {}
 
+  async getAll(user: User): Promise<UserAnimeView[]> {
+    const views = await this.userAnimeViewRepository.find({
+      where: { user },
+      relations: ["anime", "episodeViews", "episodeViews.episode"],
+      order: { updatedAt: "DESC" },
+    });
+
+    return views;
+  }
+
   async getByStatus(
     user: User,
     status: AnimeViewStatus,
@@ -46,14 +56,14 @@ export class AnimeViewService {
 
   async getByAnimeId(user: User, animeId: number): Promise<UserAnimeView> {
     return this.userAnimeViewRepository.findOne({
-      where: { user: user.id, anime: animeId },
+      where: { user, anime: animeId },
       relations: ["anime", "episodeViews", "episodeViews.episode"],
     });
   }
 
   async setStatus(user: User, animeId: number, status: AnimeViewStatus) {
     let userAnime = await this.userAnimeViewRepository.findOne({
-      where: { user: user.id, anime: animeId },
+      where: { user, anime: animeId },
       relations: ["anime", "episodeViews", "episodeViews.episode"],
     });
 

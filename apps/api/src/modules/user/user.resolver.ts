@@ -1,17 +1,29 @@
-import { UseGuards } from "@nestjs/common";
-import { Args, Context, Mutation, Resolver } from "@nestjs/graphql";
+import { Inject, UseGuards, forwardRef } from "@nestjs/common";
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
 
 import { CurrentUser } from "@ishiro/api/decorators";
 import { AuthGuard } from "@ishiro/api/guard/auth.guard";
 import { User } from "@ishiro/libs/database/entities";
 import { IshiroContext } from "@ishiro/libs/shared/interfaces/Context";
 
+import { EpisodeViewService } from "./episode-view/episode-view.service";
 import { UpdateUsernameInput } from "./user.input";
 import { UserService } from "./user.service";
 
 @Resolver(() => User)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    @Inject(forwardRef(() => EpisodeViewService))
+    private readonly episodeViewService: EpisodeViewService
+  ) {}
 
   @Mutation(() => User, { nullable: true })
   @UseGuards(AuthGuard)
@@ -26,5 +38,20 @@ export class UserResolver {
     ctx.req.session.user = newUser;
 
     return newUser;
+  }
+
+  @ResolveField(() => Number, { name: "totalSeenTime" })
+  getTotalSeenTime(@Parent() user: User): Promise<number> {
+    return this.episodeViewService.getTotalSeenTime(user);
+  }
+
+  @ResolveField(() => Number, { name: "animeSeenCount" })
+  getAnimeSeenCount(@Parent() user: User): Promise<number> {
+    return this.userService.getAnimeSeenCount(user);
+  }
+
+  @ResolveField(() => Number, { name: "episodeSeenCount" })
+  getEpisodeSeenCount(@Parent() user: User): Promise<number> {
+    return this.episodeViewService.getEpisodeSeenCount(user);
   }
 }
