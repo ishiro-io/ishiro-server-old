@@ -42,6 +42,10 @@ export class EpisodeService {
     });
   }
 
+  getCount(animeId: number): Promise<number> {
+    return this.episodeRepository.count({ where: { anime: animeId } });
+  }
+
   async createEpisode(data: CreateEpisodeInput): Promise<Episode> {
     this.logger.debug(
       `Create episode ${data.number} (anime.id: ${data.animeId})`

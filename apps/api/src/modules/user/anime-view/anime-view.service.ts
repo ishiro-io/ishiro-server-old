@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { Episode, User, UserAnimeView } from "@ishiro/libs/database/entities";
 import { AnimeViewStatus } from "@ishiro/libs/shared/enums";
 import { PaginationInput } from "@ishiro/libs/shared/inputs";
-import { AnimeService } from "@ishiro/libs/shared/services";
+import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
 
 import { UserService } from "../user.service";
 import { UserAnimeViewsByStatusOutput } from "./anime-view.output";
@@ -17,6 +17,8 @@ export class AnimeViewService {
     private readonly userAnimeViewRepository: Repository<UserAnimeView>,
     @Inject(forwardRef(() => AnimeService))
     private readonly animeService: AnimeService,
+    @Inject(forwardRef(() => EpisodeService))
+    private readonly episodeService: EpisodeService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService
   ) {}
@@ -94,6 +96,11 @@ export class AnimeViewService {
   }
 
   async getNextEpisodeToSee(userAnimeView: UserAnimeView): Promise<Episode> {
+    const episodeCount = await this.episodeService.getCount(
+      userAnimeView.anime.id
+    );
+    if (episodeCount <= 1) return undefined;
+
     const lastEpisodeSeen = await this.getLastEpisodeSeen(userAnimeView);
 
     const possibleNextEpisodeNumber = lastEpisodeSeen

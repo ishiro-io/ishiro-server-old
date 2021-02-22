@@ -1,6 +1,7 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { EpisodeModule } from "@ishiro/admin/modules/episodes/episode.module";
 import { UserAnimeView } from "@ishiro/libs/database/entities";
 
 import AnimeModule from "../../animes/anime.module";
@@ -12,6 +13,7 @@ import { AnimeViewService } from "./anime-view.service";
   imports: [
     TypeOrmModule.forFeature([UserAnimeView]),
     forwardRef(() => AnimeModule),
+    forwardRef(() => EpisodeModule),
     forwardRef(() => UserModule),
   ],
   providers: [AnimeViewService, AnimeViewResolver],
