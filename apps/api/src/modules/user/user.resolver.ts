@@ -40,7 +40,7 @@ export class UserResolver {
     return newUser;
   }
 
-  @ResolveField(() => Number, { name: "totalSeenTime" })
+  @ResolveField(() => Number, { name: "totalSeenTime", nullable: true })
   getTotalSeenTime(@Parent() user: User): Promise<number> {
     return this.episodeViewService.getTotalSeenTime(user);
   }
