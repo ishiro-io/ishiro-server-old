@@ -1,5 +1,14 @@
 # Changelog
 
+<a name="1.0.0-alpha.1"></a>
+## 1.0.0-alpha.1 (2021-03-17)
+
+### Fixed
+
+-  🩹 Fix cron job date [[7508004](https://github.com/ishiro-io/ishiro-server/commit/7508004392ce9faa938db8d4dedb3327bd103529)]
+-  🩹 Fix totalSeenTime nullability [[e7a5447](https://github.com/ishiro-io/ishiro-server/commit/e7a5447747cfadf58a8437033564ea0ada60b808)]
+
+
 <a name="1.0.0-alpha"></a>
 ## 1.0.0-alpha (2021-03-16)
 
