@@ -45,16 +45,20 @@ class HTTPClient {
   }
 
   public async callRequest(job: Job) {
-    const response = await this.api({
-      method: "GET",
-      url: `?request=${job.request}`,
-      params: { ...job.params, ...this.auth, protover: 1 },
-    });
+    try {
+      const response = await this.api({
+        method: "GET",
+        url: `?request=${job.request}`,
+        params: { ...job.params, ...this.auth, protover: 1 },
+      });
+      if (response.data.includes("<error"))
+        throw new Error(`AniDB returned an error ${response.data}`);
 
-    if (response.data.includes("<error"))
-      throw new Error(`AniDB returned an error ${response.data}`);
-
-    job.callback(response.data);
+      job.callback(response.data);
+    } catch (error) {
+      if (error.code) this.logger.error(error.code);
+      this.logger.error(error);
+    }
   }
 
   public getAnimeById(id: number): Promise<ADBAnime> {
