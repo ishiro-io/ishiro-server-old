@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { mapSeries } from "async";
 
 import { Anime } from "@ishiro/libs/database/entities";
@@ -17,7 +17,7 @@ export class UpdatedAnimesTask {
 
   private readonly logger = new Logger(UpdatedAnimesTask.name);
 
-  @Cron("0 0 0 1/1 * *")
+  @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async handleCron() {
     await this.externalAPIService.isUDPClientUp();
 
