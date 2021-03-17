@@ -120,7 +120,8 @@ export class ExternalApiService {
 
     const animeInput: CreateAnimeInput = {
       idAniDB: adbAnime.aid,
-      title: adbAnime?.titleFrench ?? aniListData?.Media?.title?.userPreferred,
+      title: aniListData?.Media?.title?.userPreferred,
+      titleFrench: adbAnime.titleFrench,
       titleEnglish: aniListData?.Media?.title?.english,
       titleRomaji: aniListData?.Media?.title?.romaji,
       titleKanji: aniListData?.Media?.title?.native,

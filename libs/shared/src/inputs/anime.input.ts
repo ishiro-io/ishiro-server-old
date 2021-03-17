@@ -12,6 +12,9 @@ export class CreateAnimeInput {
   title: string;
 
   @Field({ nullable: true })
+  titleFrench: string;
+
+  @Field({ nullable: true })
   titleEnglish: string;
 
   @Field({ nullable: true })
@@ -61,6 +64,9 @@ export class UpdateAnimeInput {
 
   @Field({ nullable: true })
   title?: string;
+
+  @Field({ nullable: true })
+  titleFrench: string;
 
   @Field({ nullable: true })
   titleEnglish: string;

@@ -19,6 +19,10 @@ export default class Anime extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  titleFrench?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   titleEnglish?: string;
 
   @Field({ nullable: true })
