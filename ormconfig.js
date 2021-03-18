@@ -7,4 +7,9 @@ module.exports = {
   cli: {
     migrationsDir: "migrations",
   },
+  extra: {
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  },
 };
