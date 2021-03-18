@@ -6,6 +6,8 @@ import redis from "redis";
 
 import ADBAnime from "./types/ADBAnime";
 
+const MAX_RETRY = 5;
+
 class HTTPClient {
   private readonly logger: Logger = new Logger("AniDB HTTP Client");
 
@@ -14,6 +16,8 @@ class HTTPClient {
   private api: AxiosInstance;
 
   private auth: Auth;
+
+  private retryCount: number = 0;
 
   constructor(auth: Auth) {
     this.auth = auth;
@@ -54,10 +58,23 @@ class HTTPClient {
       if (response.data.includes("<error"))
         throw new Error(`AniDB returned an error ${response.data}`);
 
+      this.retryCount = 0;
+
       job.callback(response.data);
     } catch (error) {
-      if (error.code) this.logger.error(error.code);
       this.logger.error(error);
+
+      if (error.message.includes("banned")) return;
+
+      if (this.retryCount <= MAX_RETRY) {
+        this.logger.warn("Retrying request...");
+
+        this.retryCount += 1;
+        this.callRequest(job);
+      } else {
+        this.retryCount = 0;
+        throw new Error("Cannot request anidb http server.");
+      }
     }
   }
 
