@@ -1,4 +1,4 @@
-import { Inject, forwardRef } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import {
   Args,
   Int,
@@ -13,23 +13,18 @@ import { format } from "date-fns";
 
 import { Anime } from "@ishiro/libs/database/entities";
 import animeIds from "@ishiro/libs/external-api/data/anime-ids";
-import { ExternalApiService } from "@ishiro/libs/external-api/external-api.service";
 import { CreateAnimeInput, UpdateAnimeInput } from "@ishiro/libs/shared/inputs";
 import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
-import { AnimeService, EpisodeService } from "@ishiro/libs/shared/services";
+import { AnimeService } from "@ishiro/libs/shared/services";
 
 import { PopulateAnimesInput } from "./anime.input";
 import { PopulatedAnimesOutput } from "./anime.output";
 
 @Resolver(() => Anime)
 export class AnimeResolver {
-  constructor(
-    private readonly animeService: AnimeService,
-    @Inject(forwardRef(() => ExternalApiService))
-    private readonly externalAPIService: ExternalApiService,
-    @Inject(forwardRef(() => EpisodeService))
-    private readonly episodeService: EpisodeService
-  ) {}
+  constructor(private readonly animeService: AnimeService) {}
+
+  private readonly logger = new Logger(AnimeResolver.name);
 
   @Query(() => [Anime], { name: "animes", nullable: false })
   async getAnimes(): Promise<Anime[]> {
@@ -66,6 +61,10 @@ export class AnimeResolver {
       doTranslateDescription,
     }: PopulateAnimesInput
   ): Promise<PopulatedAnimesOutput> {
+    this.logger.debug(
+      `Start populating animes (amount: ${animeAmount}, offset: ${offset})`
+    );
+
     const startTime = Date.now();
 
     const ids = animeIds.slice(offset, animeAmount + offset);
@@ -86,8 +85,12 @@ export class AnimeResolver {
 
     const endTime = Date.now();
 
+    const timeToPopulate = format(endTime - startTime, "mm:ss");
+
+    this.logger.debug(`Finished populating animes. Took ${timeToPopulate}`);
+
     return {
-      timeToPopulate: format(endTime - startTime, "mm:ss"),
+      timeToPopulate,
       fields,
     };
   }
