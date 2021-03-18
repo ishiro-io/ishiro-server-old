@@ -1,13 +1,15 @@
-name: Production CI
+name: Tests
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ develop, master ]
+  push:
+    branches: [ develop, master ]
 
   workflow_dispatch:
 
 jobs:
-  test-prod:
+  test-dev:
     runs-on: ubuntu-latest
 
     strategy:
