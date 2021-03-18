@@ -48,12 +48,11 @@ jobs:
 
       - id: deploy-api
         name: Deploy API to dokku
-        uses: idoberko2/dokku-deploy-github-action@v1
+        uses: dokku/github-action@v1.0.1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          dokku-host: ${{ secrets.DOKKU_HOST }}
-          app-name: ${{ secrets.DOKKU_API_APP_NAME }}
-          git-push-flags: --force
+          git_remote_url: ${{ secrets.DOKKU_REMOTE_URL_API }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          git_push_flags: --force
 
   deploy-prod-admin: 
     runs-on: ubuntu-latest
@@ -67,13 +66,12 @@ jobs:
 
       - id: deploy-admin
         name: Deploy Admin API to dokku
-        uses: idoberko2/dokku-deploy-github-action@v1
+        uses: dokku/github-action@v1.0.1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          dokku-host: ${{ secrets.DOKKU_HOST }}
-          app-name: ${{ secrets.DOKKU_ADMIN_APP_NAME }}
-          git-push-flags: --force         
-
+          git_remote_url: ${{ secrets.DOKKU_REMOTE_URL_ADMIN }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          git_push_flags: --force
+  
   deploy-prod-scheduler: 
     runs-on: ubuntu-latest
 
@@ -86,10 +84,10 @@ jobs:
 
       - id: deploy-scheduler
         name: Deploy scheduler to dokku
-        uses: idoberko2/dokku-deploy-github-action@v1
+        uses: dokku/github-action@v1.0.1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          dokku-host: ${{ secrets.DOKKU_HOST }}
-          app-name: ${{ secrets.DOKKU_SCHEDULER_APP_NAME }}
-          git-push-flags: --force
+          git_remote_url: ${{ secrets.DOKKU_REMOTE_URL_SCHEDULER }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          git_push_flags: --force
+
      
