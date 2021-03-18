@@ -1,5 +1,15 @@
 # Changelog
 
+<a name="1.0.0-alpha.2"></a>
+## 1.0.0-alpha.2 (2021-03-18)
+
+### Changed
+
+- 🥅 Add retry in case of error in external API HTTP client [[b101b9e](https://github.com/ishiro-io/ishiro-server/commit/b101b9eb24f1c4a5251103872abb3f51191cc0bf)]
+- 🥅 Catch errors in external API HTTP client [[38a9346](https://github.com/ishiro-io/ishiro-server/commit/38a9346aa699545162e9a3e1f1d30c8a0bbae15b)]
+- 🗃️ Split title &amp; frenchTitle [[a7b1134](https://github.com/ishiro-io/ishiro-server/commit/a7b1134a4e9f078d63a1da750babb3d129383d06)]
+
+
 <a name="1.0.0-alpha.1"></a>
 ## 1.0.0-alpha.1 (2021-03-17)
 

@@ -1,7 +1,7 @@
 {
   "name": "ishiro-server",
   "private": true,
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "🚀 Back-end server for Ishiro made with NestJS",
   "license": "GPL-3.0",
   "scripts": {
