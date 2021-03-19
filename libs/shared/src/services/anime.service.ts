@@ -61,7 +61,8 @@ export class AnimeService {
       .where("anime.aniDBRating IS NOT NULL")
       .take(options.limit + 1)
       .skip(options.offset)
-      .orderBy("anime.aniDBRating", "DESC");
+      .orderBy("anime.aniDBRating", "DESC")
+      .cache(ms("1d"));
 
     if (categoryId)
       queryBuilder.andWhere("category.id = :categoryId", {
