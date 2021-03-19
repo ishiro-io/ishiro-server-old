@@ -14,7 +14,7 @@ export default class Anime extends BaseEntity {
   idAniDB?: number;
 
   @Field()
-  @Column({ unique: true })
+  @Column()
   title: string;
 
   @Field({ nullable: true })
