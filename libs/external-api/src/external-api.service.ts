@@ -87,13 +87,13 @@ export class ExternalApiService {
 
     const aniListData = await this.getAniListData(adbAnime.anilistid);
 
-    const descText = aniListData?.Media?.description.replace(
-      /(<([^>]+)>)/gi,
-      ""
-    );
+    const descText =
+      aniListData?.Media?.description?.replace(/(<([^>]+)>)/gi, "") || "";
 
     const [description] =
-      doTranslateDescription && process.env.NODE_ENV === "production"
+      doTranslateDescription &&
+      descText !== "" &&
+      process.env.NODE_ENV === "production"
         ? await translate.translate(
             `${descText}\n[Description traduite automatiquement]`,
             "fr"
