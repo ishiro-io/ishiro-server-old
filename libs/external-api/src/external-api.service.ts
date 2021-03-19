@@ -12,7 +12,7 @@ import {
   CreateAnimeInput,
   CreateEpisodeInput,
 } from "@ishiro/libs/shared/inputs";
-import { CategoryService } from "@ishiro/libs/shared/services";
+import { CategoryService, TelegrafService } from "@ishiro/libs/shared/services";
 import sleep from "@ishiro/libs/utils/sleep";
 
 import HTTPClient from "./http-client";
@@ -32,7 +32,9 @@ export class ExternalApiService {
 
   constructor(
     @Inject(forwardRef(() => CategoryService))
-    private readonly categoryService: CategoryService
+    private readonly categoryService: CategoryService,
+    @Inject(forwardRef(() => TelegrafService))
+    private readonly telegrafService: TelegrafService
   ) {
     this.udpClient = new UDPClient({
       username: process.env.ANIDB_USERNAME,
@@ -42,10 +44,13 @@ export class ExternalApiService {
       protover: 3,
     });
 
-    this.httpClient = new HTTPClient({
-      client: process.env.ANIDB_HTTP_CLIENT_NAME,
-      clientver: Number(process.env.ANIDB_HTTP_CLIENT_VERSION),
-    });
+    this.httpClient = new HTTPClient(
+      {
+        client: process.env.ANIDB_HTTP_CLIENT_NAME,
+        clientver: Number(process.env.ANIDB_HTTP_CLIENT_VERSION),
+      },
+      this.telegrafService.bot
+    );
   }
 
   @Cron("*/5 * * * * *")

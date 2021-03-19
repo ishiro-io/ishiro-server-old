@@ -3,6 +3,7 @@ import { AxiosInstance } from "axios";
 import { RedisStore, setup } from "axios-cache-adapter";
 import ms from "ms";
 import redis from "redis";
+import { Telegraf } from "telegraf";
 
 import ADBAnime from "./types/ADBAnime";
 
@@ -17,10 +18,13 @@ class HTTPClient {
 
   private auth: Auth;
 
+  private bot: Telegraf;
+
   private retryCount: number = 0;
 
-  constructor(auth: Auth) {
+  constructor(auth: Auth, bot: Telegraf) {
     this.auth = auth;
+    this.bot = bot;
 
     const redisClient = redis.createClient({
       url: process.env.REDIS_URL,
@@ -64,7 +68,14 @@ class HTTPClient {
     } catch (error) {
       this.logger.error(error);
 
-      if (error.message.includes("banned")) return;
+      if (error.message.includes("banned")) {
+        this.bot.telegram.sendMessage(
+          process.env.TELEGRAM_CHAT_ID,
+          `Le client HTTP AniDB a été banni.`
+        );
+
+        return;
+      }
 
       if (this.retryCount <= MAX_RETRY) {
         this.logger.warn("Retrying request...");
@@ -73,6 +84,12 @@ class HTTPClient {
         this.callRequest(job);
       } else {
         this.retryCount = 0;
+
+        this.bot.telegram.sendMessage(
+          process.env.TELEGRAM_CHAT_ID,
+          `L'api HTTP n'a AniDB pas pu être contactée.`
+        );
+
         throw new Error("Cannot request anidb http server.");
       }
     }

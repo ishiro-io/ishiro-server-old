@@ -1,4 +1,4 @@
-import { Logger } from "@nestjs/common";
+import { Inject, Logger, forwardRef } from "@nestjs/common";
 import {
   Args,
   Int,
@@ -15,6 +15,7 @@ import { Anime } from "@ishiro/libs/database/entities";
 import animeIds from "@ishiro/libs/external-api/data/anime-ids";
 import { CreateAnimeInput, UpdateAnimeInput } from "@ishiro/libs/shared/inputs";
 import { FixNullPrototypePipe } from "@ishiro/libs/shared/pipes/fix-null-prototype.pipe";
+import { TelegrafService } from "@ishiro/libs/shared/services";
 import { AnimeService } from "@ishiro/libs/shared/services";
 
 import { PopulateAnimesInput } from "./anime.input";
@@ -22,7 +23,11 @@ import { PopulatedAnimesOutput } from "./anime.output";
 
 @Resolver(() => Anime)
 export class AnimeResolver {
-  constructor(private readonly animeService: AnimeService) {}
+  constructor(
+    private readonly animeService: AnimeService,
+    @Inject(forwardRef(() => TelegrafService))
+    private readonly telegrafService: TelegrafService
+  ) {}
 
   private readonly logger = new Logger(AnimeResolver.name);
 
@@ -64,6 +69,10 @@ export class AnimeResolver {
     this.logger.debug(
       `Start populating animes (amount: ${animeAmount}, offset: ${offset})`
     );
+    this.telegrafService.bot.telegram.sendMessage(
+      process.env.TELEGRAM_CHAT_ID,
+      `Start populating animes (amount: ${animeAmount}, offset: ${offset})`
+    );
 
     const startTime = Date.now();
 
@@ -88,6 +97,10 @@ export class AnimeResolver {
     const timeToPopulate = format(endTime - startTime, "mm:ss");
 
     this.logger.debug(`Finished populating animes. Took ${timeToPopulate}`);
+    this.telegrafService.bot.telegram.sendMessage(
+      process.env.TELEGRAM_CHAT_ID,
+      `Finished populating animes. Took ${timeToPopulate}`
+    );
 
     return {
       timeToPopulate,
